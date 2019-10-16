@@ -9,11 +9,18 @@ import { AbstractFlightService } from '../services/abstract-flight.service';
 })
 export class FlightSearchComponent implements OnInit {
 
+
+
   from = 'Wien';
   to = 'Berlin';
   flights: Flight[];
   selectedFlight: Flight;
   message: string;
+
+  basket: object = {
+    '3': true,
+    '8': true
+  }
 
 
 

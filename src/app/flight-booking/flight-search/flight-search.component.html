@@ -24,6 +24,22 @@
   </div>
 </div>
 
+<div class="row">
+
+        <app-flight-card *ngFor="let flight of flights" [flight]="flight" [(selected)]="basket[flight.id]"></app-flight-card>
+
+</div>
+
+<div class="card">
+  <pre>
+
+{{basket | json}}
+
+  </pre>
+
+</div>
+
+
 <div class="card">
 
   <table class="table table-condensed">
