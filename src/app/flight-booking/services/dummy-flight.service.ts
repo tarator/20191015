@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
 import { AbstractFlightService } from './abstract-flight.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { Flight } from '../../../entities/flight';
+import { CityFilter } from '../flight-search/flight-search.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DummyFlightService implements AbstractFlightService {
+  flights: Flight[] = [];
+
+  filter = new BehaviorSubject<CityFilter>({
+    from: 'Hamburg',
+    to: 'Graz'
+  });
 
 
   constructor() { }
