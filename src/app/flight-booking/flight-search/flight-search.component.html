@@ -6,10 +6,22 @@
 
   <div class="content">
 
-  <form>
+  <form #f="ngForm">
     <div class="form-group">
       <label>From:</label>
-      <input name="from" class="form-control" [(ngModel)]="from" >
+      <input name="from" class="form-control" [(ngModel)]="from" required
+      minlength="3"
+      maxlength="15"
+      pattern="[a-zA-Z ]*"
+      [city]="['Graz', 'Wien', 'Hamburg', 'Salzburg']"
+      cityWeb >
+        <pre *ngIf="f?.controls['from']?.invalid" >Element ist invalide.</pre>
+        <pre *ngIf="f?.controls['from']?.hasError('required')" >Pflichtfeld</pre>
+        <pre *ngIf="f?.controls['from']?.hasError('minlength')" >Min. 3 Zeichen</pre>
+        <pre *ngIf="f?.controls['from']?.hasError('maxlength')" >Max. 15 Zeichen</pre>
+        <pre *ngIf="f?.controls['from']?.hasError('city')" >Ungültige Stadt. Folgende sind gültig: {{f?.controls['from']?.errors?.city?.validCities}}</pre>
+        <pre *ngIf="f?.controls['from']?.hasError('cityWeb')" >Async validator</pre>
+        <pre *ngIf="f?.controls['from']?.errors">{{f?.controls['from']?.errors | json}}</pre>
     </div>
     <div class="form-group">
       <label>To:</label>
@@ -17,7 +29,7 @@
     </div>
 
     <div class="form-group">
-      <button
+      <button [disabled]="f?.invalid"
         class="btn btn-default" (click)="search()">Search</button>
     </div>
   </form>
