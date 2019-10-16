@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class StatusColorPipe implements PipeTransform {
 
   transform(value: boolean): string {
-    return value ? 'yellow' : 'black';
+    return value ? 'yellow' : 'green';
   }
 
 }
