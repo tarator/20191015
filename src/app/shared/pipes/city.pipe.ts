@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 
 @Pipe({
   name: 'city'

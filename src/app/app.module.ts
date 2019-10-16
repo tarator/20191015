@@ -6,21 +6,18 @@ import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { FlightSearchComponent } from './flight-search/flight-search.component';
-import { CityPipe } from './shared/pipes/city.pipe';
+import { FlightBookingModule } from './flight-booking/flight-booking.module';
 
 @NgModule({
    imports: [
       BrowserModule,
       HttpClientModule,
-      FormsModule,
+      FlightBookingModule
    ],
    declarations: [
       AppComponent,
       SidebarComponent,
-      NavbarComponent,
-      FlightSearchComponent,
-      CityPipe
+      NavbarComponent
    ],
    providers: [],
    bootstrap: [

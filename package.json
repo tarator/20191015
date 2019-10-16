@@ -2,12 +2,12 @@
   "name": "starter",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
+    "ng": "npx ng",
+    "start": "npx ng serve",
+    "build": "npx ng build",
+    "test": "npx ng test",
+    "lint": "npx ng lint",
+    "e2e": "npx ng e2e",
     "tsc": "tsc"
   },
   "private": true,
@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.803.8",
-    "@angular/cli": "~8.3.8",
+    "@angular/cli": "^8.3.9",
     "@angular/compiler-cli": "~8.2.9",
     "@angular/language-service": "~8.2.9",
     "@types/jasmine": "~3.3.8",
