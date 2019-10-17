@@ -1,4 +1,5 @@
 import { AppPage } from './app.po';
+import { browser } from 'protractor';
 
 describe('starter App', () => {
   let page: AppPage;
@@ -7,8 +8,18 @@ describe('starter App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  // xit disables a test.
+  xit('should display welcome message', () => {
     page.navigateTo();
+
+
     expect(page.getParagraphText()).toEqual('Welcome to app!');
+  });
+
+  it('should have correct page title.', () => {
+    page.navigateTo();
+
+
+    expect(browser.getTitle()).toEqual('Starter');
   });
 });
