@@ -4,6 +4,9 @@ import { validateCity, validateCityWithParams } from '../../shared/validators/va
 import { validateRoundTrip } from '../../shared/validators/validate-round-trip';
 import { Flight } from '../../../entities/flight';
 import { Observable } from 'rxjs';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { tap, switchMap } from 'rxjs/operators';
+import { FlightService } from '../services/flight.service';
 
 @Component({
   selector: 'app-flight-edit',
@@ -14,13 +17,19 @@ export class FlightEditComponent implements OnInit {
 
   @Input()
   set flight(flight: Flight) {
-    if(this.editForm) {
+    if (this.editForm) {
       this.editForm.patchValue(flight);
     }
-
   }
 
-  constructor(private fb: FormBuilder) {
+  id: number;
+  showDetail: boolean;
+
+  flightObs: Observable<Flight>;
+  constructor(
+    private fb: FormBuilder,
+    private router: ActivatedRoute,
+    private flightService: FlightService) {
    }
 
    editForm: FormGroup;
@@ -49,6 +58,17 @@ export class FlightEditComponent implements OnInit {
 
     });
 
+   this.flightObs = this.router.paramMap.pipe(
+      tap((params: ParamMap) => {
+          this.id = +params.get('id');
+          this.showDetail = !!params.get('showDetail');
+        }
+      ),
+      switchMap((params) => this.flightService.find(+params.get('id'))),
+      tap((flight: Flight) => {
+        this.editForm.patchValue(flight);
+      })
+    );
 
     // Gruppenvalidator
     this.editForm.validator = Validators.compose([this.editForm.validator, validateRoundTrip] );

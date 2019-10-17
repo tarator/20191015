@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Flight } from '../../../entities/flight';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AbstractFlightService } from './abstract-flight.service';
 import { CityFilter } from '../flight-search/flight-search.component';
@@ -36,5 +36,17 @@ export class FlightService implements AbstractFlightService {
     const headers = new HttpHeaders().set('Accept', 'application/json');
     return this.http
       .post<Flight>(url, flight, { headers });
+  }
+
+  public find(id: number): Observable<Flight> {
+    let flight: Flight;
+    flight = {
+      id: id,
+      from: 'Wien',
+      to: 'Berlin',
+      date: new Date().toISOString(),
+      delayed: false
+    };
+    return of(flight);
   }
 }

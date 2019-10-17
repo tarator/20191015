@@ -7,17 +7,22 @@ import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { FlightBookingModule } from './flight-booking/flight-booking.module';
+import { HomeComponent } from './home/home.component';
+import { RouterModule } from '@angular/router';
+import { APP_ROUTES } from './app.routes';
 
 @NgModule({
    imports: [
       BrowserModule,
       HttpClientModule,
-      FlightBookingModule
+      FlightBookingModule,
+      RouterModule.forRoot(APP_ROUTES)
    ],
    declarations: [
       AppComponent,
       SidebarComponent,
-      NavbarComponent
+      NavbarComponent,
+      HomeComponent
    ],
    providers: [],
    bootstrap: [

@@ -31,4 +31,16 @@ export class DummyFlightService implements AbstractFlightService {
   public save(flight: Flight): Observable<Flight> {
     return of(flight);
   }
+
+  public find(id: number): Observable<Flight> {
+    let flight: Flight;
+    flight = {
+      id: id,
+      from: 'Wien',
+      to: 'Berlin',
+      date: new Date().toISOString(),
+      delayed: false
+    };
+    return of(flight);
+  }
 }

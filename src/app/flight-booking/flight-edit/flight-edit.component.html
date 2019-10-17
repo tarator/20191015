@@ -1,3 +1,8 @@
+
+  <pre *ngIf="(flightObs | async) as actFlight">
+    {{ actFlight.from}}
+  </pre>
+
 <form [formGroup]="editForm">
   <div class="form-group">
       <label>Id:</label>
@@ -38,5 +43,7 @@
 
     {{ editForm.errors | json}}
   </pre>
+
+
 
 </form>
