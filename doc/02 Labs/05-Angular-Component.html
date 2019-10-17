@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>Angular Workshop: Components</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body>
+        <h1 id="angular-workshop-components">Angular Workshop: Components</h1>
+<ul>
+<li><a href="#angular-workshop-components">Angular Workshop: Components</a>
+<ul>
+<li><a href="#komponenten">Komponenten</a>
+<ul>
+<li><a href="#flightcardcomponent">FlightCardComponent</a></li>
+<li><a href="#bonus-flightstatustogglecomponent">Bonus: FlightStatusToggleComponent **</a></li>
+<li><a href="#bonus-content-projection">Bonus: Content Projection **</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="komponenten">Komponenten</h2>
+<p>In dieser Übung werden Sie zunächst die gezeigte FlightCardComponent erstellen. Danach werden Sie in einer Bonus-Übung eine eigene Komponente mit dem dabei aufgebauten Wissen erzeugen.</p>
+<h3 id="flightcardcomponent">FlightCardComponent</h3>
+<ol>
+<li>
+<p>Erstellen im Ordner <code>flight-booking</code> eine neue Komponente <code>flight-card</code>, die aus einem Unterordner <code>flight-card</code> mit folgenden Dateien besteht:</p>
+<ul>
+<li>flight-card.component.html</li>
+<li>flight-card.component.ts</li>
+</ul>
+</li>
+<li>
+<p>Öffnen Sie die Datei <em>flight-card.component.ts</em> und spendieren Sie ihr die folgenden Member:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@Component</span>({
+  selector: <span class="hljs-string">'flight-card'</span>,
+  templateUrl: <span class="hljs-string">'./flight-card.component.html'</span>
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FlightCardComponent <span class="hljs-keyword">implements</span> OnInit {
+
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"></span>) { }
+
+  <span class="hljs-meta">@Input</span>() item: Flight;
+  <span class="hljs-meta">@Input</span>() selected: <span class="hljs-built_in">boolean</span>;
+  <span class="hljs-meta">@Output</span>() selectedChange = <span class="hljs-keyword">new</span> EventEmitter&lt;<span class="hljs-built_in">boolean</span>&gt;();
+
+  ngOnInit() {
+  }
+
+  select() {
+    <span class="hljs-keyword">this</span>.selected = <span class="hljs-literal">true</span>;
+    <span class="hljs-keyword">this</span>.selectedChange.emit(<span class="hljs-keyword">this</span>.selected);
+  }
+
+  deselect() {
+    <span class="hljs-keyword">this</span>.selected = <span class="hljs-literal">false</span>;
+    <span class="hljs-keyword">this</span>.selectedChange.emit(<span class="hljs-keyword">this</span>.selected);
+  }
+
+}
+</div></code></pre>
+</li>
+</ol>
+<p>Beachten Sie, dass hier der Selektor <em>flight-card</em> festgelegt wurde.</p>
+<ol>
+<li>
+<p>Öffnen Sie das Template dieser Komponente (<code>flight-card.component.html</code>). Erweitern Sie diese Datei, sodass die Karte dargestellt wird:</p>
+<pre><code class="language-TypeScript"><div>&lt;div
+<span class="hljs-keyword">class</span>=<span class="hljs-string">"card"</span>
+[ngStyle]=<span class="hljs-string">"{'background-color': (selected) ? 'rgb(204, 197, 185)' : 'white' }"</span>&gt;
+
+  &lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">"header"</span>&gt;
+  &lt;h2 <span class="hljs-keyword">class</span>=<span class="hljs-string">"title"</span>&gt;{{item.from}} - {{item.to}}&lt;<span class="hljs-regexp">/h2&gt;
+  &lt;/</span>div&gt;
+  &lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">"content"</span>&gt;
+  &lt;p&gt;Flight-No.: #{{item.id}}&lt;<span class="hljs-regexp">/p&gt;
+  &lt;p&gt;Date: {{item.date | date:'dd.MM.yyyy HH:mm'}}&lt;/</span>p&gt;
+
+  &lt;p&gt;
+  &lt;button
+    <span class="hljs-keyword">class</span>=<span class="hljs-string">"btn btn-default"</span>
+    *ngIf=<span class="hljs-string">"!selected"</span>
+    (click)=<span class="hljs-string">"select()"</span>&gt;Select&lt;<span class="hljs-regexp">/button&gt;
+  &lt;button
+    class="btn btn-default"
+    *ngIf="selected"
+    (click)="deselect()"&gt;Remove&lt;/</span>button&gt;
+
+  &lt;<span class="hljs-regexp">/p&gt;
+
+  &lt;/</span>div&gt;
+&lt;<span class="hljs-regexp">/div&gt;
+</span></div></code></pre>
+<p>Beachten Sie die Datenbindungsausdrücke in diesem Template.</p>
+</li>
+<li>
+<p>Wechseln Sie in die Datei <em>flight-booking.module.ts</em>. Vergewissern Sie sich, dass hier die neue <em>FlightCardComponent</em> registriert wird.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@NgModule</span>({
+imports: [
+  CommonModule,
+  FormsModule,
+  SharedModule
+],
+declarations: [
+  FlightSearchComponent,
+  FlightCardComponent  <span class="hljs-comment">// &lt;-- Diese Zeile ist wichtig!</span>
+],
+providers:[ ],
+exports: [
+  FlightSearchComponent
+]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FlightBookingModule { }
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Öffnen Sie die Datei <em>flight-search.component.ts</em> und ergänzen Sie die eine Eigenschaft <em>basket</em>:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FlightSearchComponent <span class="hljs-keyword">implements</span> OnInit {
+
+  <span class="hljs-keyword">from</span>: <span class="hljs-built_in">string</span>;
+  to: <span class="hljs-built_in">string</span>;
+  flights: <span class="hljs-built_in">Array</span>&lt;Flight&gt; = [];
+  selectedFlight: Flight;
+
+
+  basket: object = {   <span class="hljs-comment">// &lt;-- Neue Eigenschaft</span>
+  <span class="hljs-string">"3"</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-string">"5"</span>: <span class="hljs-literal">true</span>
+  };
+
+  […]
+}
+</div></code></pre>
+</li>
+<li>
+<p>Öffnen Sie die Datei <em>flight-search.component.html</em>. Kommentieren Sie die tabellarische Ausgabe der gefundenen Flüge aus.</p>
+</li>
+<li>
+<p>Nutzen Sie anstatt der Tabelle die neue das Element <code>flight-card</code> um die gefundenen Flüge darzustellen. Erstellen Sie dazu eine explizite Bindung für die Eigenschaften <code>item</code>, <code>selected</code> und <code>selectedChange</code>.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-HTML"><div><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"row"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> *<span class="hljs-attr">ngFor</span>=<span class="hljs-string">"let f of flights"</span> 
+  <span class="hljs-attr">class</span>=<span class="hljs-string">"col-xs-12 col-sm-6 col-md-4 col-lg-3"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">flight-card</span>
+    [<span class="hljs-attr">item</span>]=<span class="hljs-string">"f"</span>
+    [<span class="hljs-attr">selected</span>]=<span class="hljs-string">"basket[f.id]"</span>
+    (<span class="hljs-attr">selectedChange</span>)=<span class="hljs-string">"basket[f.id] = $event"</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">flight-card</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Aktualisieren Sie am Ende des Templates auch den Warenkorb, sodass hier die neue Eigenschaft <code>basket</code> anstatt von <code>selectedFlight</code> ausgegeben wird.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-HTML"><div><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"card"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"content"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span>{{ basket | json }}<span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung.</p>
+</li>
+<li>
+<p>Nutzen Sie beim Aufruf der <em>FlugCardComponent</em> anstatt der Bindings für <em>selected</em> und <em>selectedChanged</em> ein Two-Way-Binding unter Verwendung der &quot;Banana-in-a-Box-Syntax&quot;.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div>&lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">"row"</span>&gt;
+  &lt;div *ngFor=<span class="hljs-string">"let f of flights"</span> 
+  <span class="hljs-keyword">class</span>=<span class="hljs-string">"col-xs-12 col-sm-6 col-md-4 col-lg-3"</span>&gt;
+  &lt;flight-card
+    [item]=<span class="hljs-string">"f"</span>
+    [(selected)]=<span class="hljs-string">"basket[f.id]"</span>&gt;
+  &lt;<span class="hljs-regexp">/flight-card&gt;
+  &lt;/</span>div&gt;
+&lt;<span class="hljs-regexp">/div&gt;
+</span></div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung.</p>
+</li>
+</ol>
+<h3 id="bonus-flightstatustogglecomponent">Bonus: FlightStatusToggleComponent **</h3>
+<p>Erstellen Sie eine <em>StatusToggleComponent</em>, die das Flag delayed eines Fluges per Two-Way-Binding entgegennimmt und als Link anzeigt. Bei jedem Klick auf diesen Link soll der Status gewechselt werden. Die Komponente soll wie folgt im Template der FlightCardComponent aufgerufen werden werden können:</p>
+<pre><code class="language-HTML"><div><span class="hljs-tag">&lt;<span class="hljs-name">status-toggle</span> [(<span class="hljs-attr">status</span>)]=<span class="hljs-string">"item.delayed"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">status-toggle</span>&gt;</span>
+</div></code></pre>
+<h3 id="bonus-content-projection">Bonus: Content Projection **</h3>
+<p>In dieser Bonus-Übung schaffen Sie die Möglichkeit, die Darstellung der <em>FlightCardComponent</em> zu erweitern, indem Sie beim Aufruf zusätzlich anzuzeigendes HTML übergeben.</p>
+<ol>
+<li>
+<p>Öffnen Sie die Datei flight-search.component.html und übergeben Sie an die_FlightCardComponent_ zusätzliches HTML:</p>
+<pre><code class="language-HTML"><div><span class="hljs-tag">&lt;<span class="hljs-name">flight-card</span> […]&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span>{{ f | json }}<span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">flight-card</span>&gt;</span> 
+</div></code></pre>
+</li>
+<li>
+<p>Platzieren Sie im <strong>Template der</strong>  <strong>FlightCardComponent</strong> das Element <em>ng-content</em>, um anzuzeigen, wo das übergebene Markup anzuzeigen ist:</p>
+<pre><code class="language-HTML"><div>[…]
+<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"content"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Flight-No.: #{{item.id}}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Date: {{item.date | date:'dd.MM.yyyy HH:mm'}}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+
+    <span class="hljs-tag">&lt;<span class="hljs-name">ng-content</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">ng-content</span>&gt;</span>
+
+  […]
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+[…]
+</div></code></pre>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung.</p>
+</li>
+<li>
+<p>Ergänzen Sie das Template, sodass es nun das Element <em>ng-content</em> zwei Mal verwendet – einmal im oberen Bereich und einmal im unteren Bereich der Komponente:</p>
+<pre><code class="language-HTML"><div>[…]
+<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"content"</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">ng-content</span> <span class="hljs-attr">select</span>=<span class="hljs-string">".top"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">ng-content</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Flight-No.: #{{item.id}}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Date: {{item.date | date:'dd.MM.yyyy HH:mm'}}<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+
+  <span class="hljs-tag">&lt;<span class="hljs-name">ng-content</span> <span class="hljs-attr">select</span>=<span class="hljs-string">".bottom"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">ng-content</span>&gt;</span>
+
+  […]
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+[…]
+</div></code></pre>
+<p>Um Angular zu zeigen, was in die einzelnen mit <em>ng-content</em> definierten Platzhalter einzufügen ist, erhalten diese über die Eigenschaft <em>select</em> einen CSS-Selektor, der einen Teil des übergebenen Markups adressiert. Der Selektor <em>.top</em> sucht im Markup beispielsweise nach einem Element mit der Klasse <em>top</em> und fügt es in das jeweilige <em>ng-content</em>-Element ein.</p>
+</li>
+<li>
+<p>Öffnen Sie die Datei <em>flight-search.component.html</em>. Übergeben Sie beim Aufruf der <em>flight-card</em> Elemente für die beiden definierten Platzhalter:</p>
+<pre><code class="language-HTML"><div><span class="hljs-tag">&lt;<span class="hljs-name">flight-card</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">h1</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"top"</span>&gt;</span>Flight<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">pre</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"bottom"</span>&gt;</span>{{ f | json }}<span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">flight-card</span>&gt;</span>
+</div></code></pre>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung.</p>
+</li>
+</ol>
+
+    </body>
+    </html>

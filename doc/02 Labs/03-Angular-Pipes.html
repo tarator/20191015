@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>Angular Workshop: Pipes</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body>
+        <h1 id="angular-workshop-pipes">Angular Workshop: Pipes</h1>
+<ul>
+<li><a href="#angular-workshop-pipes">Angular Workshop: Pipes</a>
+<ul>
+<li><a href="#eigene-pipe-erstellen">Eigene Pipe erstellen</a></li>
+<li><a href="#bonusaufgaben-zu-pipes">Bonusaufgaben zu Pipes</a>
+<ul>
+<li><a href="#bonus-statuscolorpipe">Bonus: StatusColorPipe *</a></li>
+<li><a href="#bonus-statusfilterpipe">Bonus: StatusFilterPipe *</a></li>
+<li><a href="#bonus-service-f%c3%bcr-pipe">Bonus: Service für Pipe *</a></li>
+<li><a href="#bonus-asynchroner-service-f%c3%bcr-pipe">Bonus: Asynchroner Service für Pipe **</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="eigene-pipe-erstellen">Eigene Pipe erstellen</h2>
+<ol>
+<li>
+<p>Erstellen Sie im Ordner <em>src/app</em> die Unterordner <em>shared/pipes</em>.</p>
+</li>
+<li>
+<p>Erstellen Sie in diesem Ordner eine neue Datei <em>city.pipe.ts</em> mit einer <em>CityPipe</em>. Diese Pipe soll die Städtenamen wie <code>Graz</code> oder <code>Hamburg</code> abhängig von einem übergebenen Parameter entweder auf Flughafencodes wie <code>GRZ</code> oder <code>HAM</code> oder auf Lanbezeichnungen wie <code>Flughafen Graz Thalerhof</code> oder <code>Airport Hamburg Helmut Schmidt</code> abbilden.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div><span class="hljs-keyword">import</span> { Pipe, PipeTransform } <span class="hljs-keyword">from</span> <span class="hljs-string">'@angular/core'</span>;
+
+<span class="hljs-meta">@Pipe</span>({
+  name: <span class="hljs-string">'city'</span>,
+  pure: <span class="hljs-literal">true</span>
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> CityPipe <span class="hljs-keyword">implements</span> PipeTransform {
+
+  transform(value: <span class="hljs-built_in">string</span>, fmt: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">string</span> {
+
+    <span class="hljs-keyword">let</span> short, long;
+
+    <span class="hljs-keyword">switch</span>(value) {
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'Graz'</span>:
+        short = <span class="hljs-string">'GRZ'</span>;
+        long = <span class="hljs-string">'Flughafen Graz Thalerhof'</span>;
+        <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'Hamburg'</span>:
+        short = <span class="hljs-string">'HAM'</span>;
+        long = <span class="hljs-string">'Airport Hamburg Fulsbüttel Helmut Schmidt'</span>;
+      <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">case</span> <span class="hljs-string">'Wien'</span>:
+        short = <span class="hljs-string">'VIE'</span>;
+        long = <span class="hljs-string">'Flughafen Wien Schwechat'</span>;
+      <span class="hljs-keyword">break</span>;
+      <span class="hljs-keyword">default</span>:
+        short = long = value    ;
+    }
+
+    <span class="hljs-keyword">if</span> (fmt === <span class="hljs-string">'short'</span>) {
+      <span class="hljs-keyword">return</span> short;
+    }
+
+    <span class="hljs-keyword">return</span> long;
+  }
+
+}
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Öffnen Sie die Datei <em>app.module.ts</em> und stellen Sie sicher, dass die neue Pipe registriert wurde.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@NgModule</span>({
+imports: [
+  BrowserModule,
+  FormsModule,
+  HttpClientModule
+],
+declarations: [
+  [...],
+  AppComponent,
+  FlightSearchComponent,
+  CityPipe   <span class="hljs-comment">// &lt;-- Diese Zeile ist wichtig!</span>
+],
+providers: [
+  […]
+],
+bootstrap: [AppComponent]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> AppModule { }
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Öffnen Sie die Datei <em>flight-search.component.html</em> und nutzen Sie die <em>CityPipe</em> zum Formatieren der Städte der gefundenen Flüge.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div>&lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">"card"</span>&gt;
+
+  &lt;table <span class="hljs-keyword">class</span>=<span class="hljs-string">"table table-condensed"</span> *ngIf=<span class="hljs-string">"flights.length &gt; 0"</span>&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Id&lt;<span class="hljs-regexp">/th&gt;
+        &lt;th&gt;From&lt;/</span>th&gt;
+        &lt;th&gt;To&lt;<span class="hljs-regexp">/th&gt;
+        &lt;th&gt;Date&lt;/</span>th&gt;
+        &lt;th&gt;&lt;<span class="hljs-regexp">/th&gt;
+      &lt;/</span>tr&gt;
+    &lt;<span class="hljs-regexp">/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr
+        *ngFor="let f of flights" 
+        [class.active]="f === selectedFlight"&gt;
+        &lt;td&gt;{{f.id}}&lt;/</span>td&gt;
+        &lt;td&gt;{{f.from | city:<span class="hljs-string">'short'</span> }}&lt;<span class="hljs-regexp">/td&gt;
+        &lt;td&gt;{{f.to | city:'long' }}&lt;/</span>td&gt;
+        &lt;td&gt;{{f.date | date:<span class="hljs-string">'dd.MM.yyyy HH:mm'</span>}}&lt;<span class="hljs-regexp">/td&gt;
+        &lt;td&gt;
+          &lt;a (click)="select(f)"&gt;Select&lt;/</span>a&gt; 
+        &lt;<span class="hljs-regexp">/td&gt;
+      &lt;/</span>tr&gt;
+    &lt;<span class="hljs-regexp">/tbody&gt;
+  &lt;/</span>table&gt;
+
+&lt;<span class="hljs-regexp">/div&gt;
+</span></div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung.</p>
+</li>
+</ol>
+<h2 id="bonusaufgaben-zu-pipes">Bonusaufgaben zu Pipes</h2>
+<h3 id="bonus-statuscolorpipe">Bonus: StatusColorPipe *</h3>
+<p>Erstellen Sie eine <em>StatusColorPipe</em>, welche die Eigenschaft <em>delayed</em> des Fluges (true oder false) auf eine Farbe abbildet. Nutzen Sie diese Pipe gemeinsam mit der Direktive <em>ngStyle</em>, um diese Farbe zur CSS-Eigenschaft <em>color</em> des ausgegebenen Status zuzuweisen:</p>
+<pre><code class="language-HTML"><div><span class="hljs-tag">&lt;<span class="hljs-name">td</span> [<span class="hljs-attr">ngStyle</span>]=<span class="hljs-string">"{color: f.delayed | statusColor }"</span>&gt;</span>
+ {{ flight.date | date:'dd.MM.yyyy HH:mm'}}
+<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+</div></code></pre>
+<h3 id="bonus-statusfilterpipe">Bonus: StatusFilterPipe *</h3>
+<p>Erstellen Sie eine <em>StatusFilterPipe</em>, welche ein Array mit Flügen filtert, sodass nur Flüge mit einem bestimmten Wert für <em>delayed</em> zurückgeliefert werden. Die Pipe soll wie folgt verwendet werden können:</p>
+<pre><code class="language-HTML"><div><span class="hljs-tag">&lt;<span class="hljs-name">tr</span> *<span class="hljs-attr">ngFor</span>=<span class="hljs-string">"let f of flights | statusFilter:true"</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+</div></code></pre>
+<p>Der Parameter <em>true</em> gibt hier an, dass nur die Flüge mit <em>delayed=true</em> zurückzuliefern sind.</p>
+<p>Die Transform-Methode dieser Pipe nimmt das gesamte Array entgegen und liefert danach eine gefilterte Version zurück:</p>
+<pre><code class="language-TypeScript"><div>transform(flights: <span class="hljs-built_in">Array</span>&lt;Flight&gt;, delayed: <span class="hljs-built_in">boolean</span>): <span class="hljs-built_in">Array</span>&lt;Flight&gt; {
+ […]
+}
+</div></code></pre>
+<p>Eine Beschreibung der Methoden, welche die Klasse Array anbietet, finden Sie unter anderem hier:
+<a href="https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array">https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Array</a></p>
+<h3 id="bonus-service-f%c3%bcr-pipe">Bonus: Service für Pipe *</h3>
+<p>Lagern Sie die Logik mit dem Switch-Block in einen neuen <em>AirportService</em> aus. Registrieren Sie diesen Service auf Modul-Ebene und lassen Sie ihn in den Konstruktor der Pipe injizieren (funktioniert wie bei Komponenten). Rufen Sie dann den Service in der Methode transform auf und testen Sie Ihre Lösung.</p>
+<h3 id="bonus-asynchroner-service-f%c3%bcr-pipe">Bonus: Asynchroner Service für Pipe **</h3>
+<p>Sie finden unter den nachfolgenden Urls zwei Services, die den offiziellen Kurz- sowie den offiziellen Lang-Namen eines Flughafens (als String) liefern:</p>
+<ul>
+<li><a href="http://www.angular.at/api/airport/code?name=Graz">http://www.angular.at/api/airport/code?name=Graz</a></li>
+<li><a href="http://www.angular.at/api/airport/fullName?name=Graz">http://www.angular.at/api/airport/fullName?name=Graz</a></li>
+</ul>
+<p>Erweitern Sie Ihren Airport-Service um Methoden, die damit die Lang- bzw. Kurz-Bezeichnung eines Flughafens als <em>Observable&lt;string&gt;</em> zurückliefern.</p>
+<p>Schreiben Sie eine neue <code>AsyncCityPipe</code>, die sich diesen Service injizieren lässt. Die transform-Methode soll an den Service delegieren und das gewünschte Ergebnis in Form des erhaltenen als <em>Observable&lt;string&gt;</em> zurückliefern. Damit Angular dieses Observable auflösen kann, muss im Template zusätzlich die Async-Pipe verwendet werden:</p>
+<pre><code class="language-HTML"><div>[...]
+{{ f.from | asyncCity:'short' | async }}
+[...]
+</div></code></pre>
+
+    </body>
+    </html>

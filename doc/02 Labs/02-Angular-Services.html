@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>Angular Workshop: Services</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body>
+        <h1 id="angular-workshop-services">Angular Workshop: Services</h1>
+<ul>
+<li><a href="#angular-workshop-services">Angular Workshop: Services</a>
+<ul>
+<li><a href="#eigenen-services-erstellen">Eigenen Services erstellen</a>
+<ul>
+<li><a href="#flightservice">FlightService</a></li>
+<li><a href="#bonus-augury">Bonus: Augury *</a></li>
+<li><a href="#bonus-alternative-implementierung">Bonus: Alternative Implementierung *</a></li>
+<li><a href="#bonus-usefactory">Bonus: useFactory **</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="eigenen-services-erstellen">Eigenen Services erstellen</h2>
+<h3 id="flightservice">FlightService</h3>
+<p>In dieser Übung werden Sie einen <code>FlugService</code>, der die Kommunikation mit der Flug API via HTTP übernimmt, entwickeln und innerhalb Ihrer Komponente verwenden:</p>
+<pre><code><div>[FlightSearchComponent] --&gt; [FlightService]
+</div></code></pre>
+<p>Sie können dazu den nachfolgenden Punkten folgen oder nur bei Bedarf nachschlagen.</p>
+<ol>
+<li>
+<p>Erstellen Sie im Ordner <em>flight-search</em> einen Service. Die Datei dieses Services soll <em>flight.service.ts</em> heißen.</p>
+</li>
+<li>
+<p>Implementieren Sie in dieser Datei einen <em>FlightService</em>, der die von der Anwendung benötigten Flüge abruft. Dieser muss sich zum Verrichten seiner Aufgabe den <em>HttpClient</em> injizieren lassen.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@Injectable</span>({ providedIn: <span class="hljs-string">'root'</span> })
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FlightService {
+
+<span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> http: HttpClient</span>) {
+}
+
+  find(<span class="hljs-keyword">from</span>: <span class="hljs-built_in">string</span>, to: <span class="hljs-built_in">string</span>): Observable&lt;Flight[]&gt; {
+  <span class="hljs-keyword">let</span> url = <span class="hljs-string">'http://www.angular.at/api/flight'</span>;
+
+  <span class="hljs-keyword">let</span> headers = <span class="hljs-keyword">new</span> HttpHeaders()
+        .set(<span class="hljs-string">'Accept'</span>, <span class="hljs-string">'application/json'</span>);
+
+  <span class="hljs-keyword">let</span> params = <span class="hljs-keyword">new</span> HttpParams()
+        .set(<span class="hljs-string">'from'</span>, <span class="hljs-keyword">from</span>)
+        .set(<span class="hljs-string">'to'</span>, to);
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.http.get&lt;Flight[]&gt;(url, {headers, params});
+  }
+
+}
+</div></code></pre>
+ </p>
+ </details>
+<p>Falls Sie die Bonus-Aufgabe <em>Flüge editieren</em> weiter oben gemacht haben, müssen Sie nun auch die Methode <em>save</em> in den Service auslagern.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div>save(flight: Flight): Observable&lt;Flight&gt; {
+  <span class="hljs-keyword">let</span> url = <span class="hljs-string">'http://www.angular.at/api/flight'</span>;
+
+  <span class="hljs-keyword">let</span> headers = <span class="hljs-keyword">new</span> HttpHeaders()
+      .set(<span class="hljs-string">'Accept'</span>, <span class="hljs-string">'application/json'</span>);
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.http.post&lt;Flight&gt;(url, flight, { headers });
+}
+</div></code></pre>
+ </p>
+ </details> 
+</li>
+<li>
+<p>Öffnen Sie die Datei <em>flight-search.component.ts</em> und lassen Sie sich den neuen Service in den Konstruktor injizieren.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div>[…]
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FlightSearchComponent {
+  […]
+  <span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> flightService: FlightService</span>) { }
+  […]
+}
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Nutzen Sie den injizierten <em>FlightService</em> in der Methode <em>search</em> zum Suchen nach Flügen.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div>search(): <span class="hljs-built_in">void</span> {
+  <span class="hljs-keyword">this</span>.flightService
+    .find(<span class="hljs-keyword">this</span>.from, <span class="hljs-keyword">this</span>.to)
+    .subscribe(
+      <span class="hljs-function">(<span class="hljs-params">flights</span>) =&gt;</span> {
+        <span class="hljs-keyword">this</span>.flights = flights;
+      },
+      <span class="hljs-function">(<span class="hljs-params">errResp</span>) =&gt;</span> {
+        <span class="hljs-built_in">console</span>.error(<span class="hljs-string">'Error loading flights'</span>, errResp);
+      });
+}
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung im Browser.</p>
+</li>
+<li>
+<p>Stellen Sie mit dem Debugger sicher, dass zunächst der <em>FlightService</em> den <em>HttpClient</em> injiziert bekommt und dann die Komponente den <em>FlightService</em> auf diese selbe Weise erhält.</p>
+</li>
+</ol>
+<h3 id="bonus-augury">Bonus: Augury *</h3>
+<ol>
+<li>
+<p>Installieren Sie das Chrome-Plugin Augury (<code>augury.angular.io</code>).</p>
+</li>
+<li>
+<p>Registrieren Sie Ihren Service global (im <em>AppModule</em>) und nutzen Sie ihn in Ihrer Komponente.</p>
+</li>
+<li>
+<p>Laden Sie Ihre Anwendung und wechseln Sie in den Dev-Tools (F12) auf das neue Registerblatt Augury.</p>
+</li>
+<li>
+<p>Markieren Sie die <em>FlightSearchComponent</em> und wechseln Sie in das Registerblatt <em>Injector Graph</em>.</p>
+</li>
+<li>
+<p>Dort sollten Sie nun in einer graphischen Übersicht sehen, wo Ihr Service registriert wird und dass er in die <em>FlightSearchComponent</em> injiziert wird.</p>
+</li>
+</ol>
+<h3 id="bonus-alternative-implementierung">Bonus: Alternative Implementierung *</h3>
+<ol>
+<li>
+<p>Erzeugen Sie im Ordner <em>flight-search</em> eine Datei abstract-flight.service.ts.</p>
+</li>
+<li>
+<p>Spendieren Sie dieser Datei eine abstrakte Klasse <em>AbstractFlightService</em>. Diese Klasse soll die Methode(n) des <em>FlightService</em> als abstrakte Methoden vorgeben:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@Injectable</span>({
+  providedIn: <span class="hljs-string">'root'</span>,
+  useClass: FlightService,
+  deps: [HttpClient]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> AbstractFlightService {
+  <span class="hljs-keyword">abstract</span> find(<span class="hljs-keyword">from</span>: <span class="hljs-built_in">string</span>, to:<span class="hljs-built_in">string</span>): Observable&lt;Flight[]&gt;;
+}
+</div></code></pre>
+</li>
+<li>
+<p>Wechseln Sie in die Datei <em>flight.service.ts</em> und lassen Sie <em>FlightService</em> die Klasse <em>AbstractFlightService</em> implementieren:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@Injectable</span>({ [...] })
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FlightService <span class="hljs-keyword">implements</span> AbstractFlightService {
+  […]
+}
+</div></code></pre>
+<p>Das Schlüsselwort <em>implements</em> gibt an, dass der <em>FlightService</em> sämtliche Methoden des <em>AbstractFlightServices</em> implementieren muss. Im Gegensatz zum Schlüsselwort <em>extends</em> findet jedoch keine Vererbung statt.</p>
+</li>
+<li>
+<p>Fordern Sie per Dependency Injection in Ihrer Komponente eine Instanz von <em>AbstractFlightService</em> *<em>anstatt</em> einer Instanz von <em>FlightService</em> an:</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div><span class="hljs-keyword">constructor</span>(<span class="hljs-params"><span class="hljs-keyword">private</span> flightServie: AbstractFlightService</span>) { […] }
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung.</p>
+</li>
+<li>
+<p>Erstellen Sie im Ordner <em>flight-search</em> eine Datei <em>dummy-flight.service.ts</em>.</p>
+</li>
+<li>
+<p>Stellen Sie in dieser Datei eine alternative Implementierung von <em>AbstractFlightService</em> zur Verfügung. Diese soll sich <em>DummyFlightService</em> nennen und ein paar hartcodierte Flüge zum Testen zurück liefern:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-keyword">import</span> { of } <span class="hljs-keyword">from</span> <span class="hljs-string">'rxjs'</span>;
+[…]
+
+<span class="hljs-meta">@Injectable</span>()
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> DummyFlightService <span class="hljs-keyword">implements</span> AbstractFlightService {
+
+  find(<span class="hljs-keyword">from</span>: <span class="hljs-built_in">string</span>, to: <span class="hljs-built_in">string</span>): Observable&lt;Flight[]&gt; {
+
+    <span class="hljs-keyword">return</span> of([{
+      id: <span class="hljs-number">17</span>,
+      <span class="hljs-keyword">from</span>: <span class="hljs-string">'Graz'</span>,
+      to: <span class="hljs-string">'Hamburg'</span>,
+      date: <span class="hljs-string">'2022-01-01'</span>,
+      delayed: <span class="hljs-literal">true</span>
+    }]);
+  }
+}
+</div></code></pre>
+<p>Die hier gezeigte Funktion <em>of</em> erzeugt ein Observable, das das übergebene Array mit Flügen zurückliefert.</p>
+</li>
+<li>
+<p>Lassen Sie nun Ihren <code>AbstractFlightService</code> auf den neuen <code>DummyFlightService</code> verweisen.</p>
+ <details>
+ <summary>Code anzeigen</summary>
+ <p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@Injectable</span>({
+  providedIn: <span class="hljs-string">'root'</span>,
+  useClass: DummyFlightService,
+  deps: [HttpClient]  
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> AbstractFlightService {
+  <span class="hljs-keyword">abstract</span> find(<span class="hljs-keyword">from</span>: <span class="hljs-built_in">string</span>, to:<span class="hljs-built_in">string</span>): Observable&lt;Flight[]&gt;;
+}
+</div></code></pre>
+ </p>
+ </details>
+</li>
+<li>
+<p>Testen Sie Ihre Lösung und vergewissern sie sich, dass der neue <em>DummyFlightService</em> zum Einsatz kommt.</p>
+</li>
+<li>
+<p>Stellen Sie die Serviceregistrierung wieder um, sodass Sie allen Konsumenten, die den <em>AbstractFlightService</em> verlangen, den ursprünglichen <em>FlightService</em> zukommen lässt:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@Injectable</span>({
+  providedIn: <span class="hljs-string">'root'</span>,
+  useClass: FlightService,
+  deps: [HttpClient]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> AbstractFlightService {
+  <span class="hljs-keyword">abstract</span> find(<span class="hljs-keyword">from</span>: <span class="hljs-built_in">string</span>, to:<span class="hljs-built_in">string</span>): Observable&lt;Flight[]&gt;;
+}
+</div></code></pre>
+</li>
+</ol>
+<h3 id="bonus-usefactory">Bonus: useFactory **</h3>
+<p>Mit <code>useFactory</code> können Sie eine Factory-Funktion, die angibt, wie Ihr Service zu erzeugen ist, angeben:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@Injectable</span>({
+  providedIn: <span class="hljs-string">'root'</span>,
+  useFactory: <span class="hljs-function">(<span class="hljs-params">http: HttpClient</span>) =&gt;</span> <span class="hljs-keyword">new</span> FlightService(http),
+  deps: [HttpClient]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> AbstractFlightService {
+  <span class="hljs-keyword">abstract</span> find(<span class="hljs-keyword">from</span>: <span class="hljs-built_in">string</span>, to:<span class="hljs-built_in">string</span>): Observable&lt;Flight[]&gt;;
+}
+</div></code></pre>
+
+    </body>
+    </html>

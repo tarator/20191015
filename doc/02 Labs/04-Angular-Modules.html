@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>Angular Workshop: Modules</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body>
+        <h1 id="angular-workshop-modules">Angular Workshop: Modules</h1>
+<ul>
+<li><a href="#angular-workshop-modules">Angular Workshop: Modules</a>
+<ul>
+<li><a href="#module">Module</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="module">Module</h2>
+<p>In dieser Übung werden Sie Ihre Lösung refaktorieren, sodass sich die folgende Module-Struktur ergibt:</p>
+<pre><code><div>[AppModule] --&gt; [FlightBookingModule] --&gt; [SharedModule]
+</div></code></pre>
+<p>Jedes Modul erhält Ihren eigenen Ordner und im Rahmen dessen wird die <code>FlightSearchComponent</code> in den neu geschaffenen Ordner des <code>FlightBookingModule</code>s verschoben:</p>
+<pre><code><div> /src
+ +-- /app
+  +-- ...
+  +-- /flight-booking
+   +-- ...
+   +-- /flight-search
+    +-- flight-search.component.ts
+    +-- flight-search.component.html
+    +-- ..
+   +-- flight-booking.module.ts
+  +-- /shared
+   +-- ...
+   +-- shared.module.ts
+  +-- app.module.ts
+</div></code></pre>
+<p>Denken Sie daran, dass das <code>SharedModule</code> und das <code>FlightBookingModule</code> das von Angular angeobtene <code>CommonModule</code> (<code>@angular/common</code>) importieren muss, damit Standard-Direktiven und -Pipes wie <code>ngFor</code> oder <code>date</code> gefunden werden.</p>
+<details>
+<summary>Einzelne Schritte anzeigen</summary>
+<p>
+<ol>
+<li>
+<p>Erstellen Sie im Ordner <em>shared</em> eine Datei <em>shared.module.ts</em> und spendieren Sie dieser Datei eine Klasse <em>SharedModule</em>:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@NgModule</span>({
+  imports: [
+    CommonModule
+  ],
+  declarations: [
+    CityPipe
+  ],
+  exports: [
+    CityPipe
+  ]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> SharedModule { }
+</div></code></pre>
+<p>Beachten Sie, dass nun hier die <em>CityPipe</em> sowohl deklariert als auch exportiert wird.</p>
+</li>
+<li>
+<p>Erstellen Sie im Ordner <em>src/app</em> einen Ordner <em>flight-booking</em>.</p>
+</li>
+<li>
+<p>Verschieben Sie den Ordner <em>flight-search</em> nach <em>flight-booking</em>. Passen Sie alle vorhandenen relativen Pfade an, falls dieser Refaktorierungsschritt nicht ohnehin von Ihrer IDE übernommen wird.</p>
+</li>
+<li>
+<p>Erstellen Sie im Ordner <em>flight-booking</em> eine Datei <em>flight-booking.module.ts</em> mit einem <em>FlightBookingModule</em>:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@NgModule</span>({
+imports: [
+  CommonModule,
+  FormsModule,
+  SharedModule
+],
+declarations: [
+  FlightSearchComponent
+],
+providers:[
+],
+exports: [
+  FlightSearchComponent
+]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> FlightBookingModule { }
+</div></code></pre>
+<p>Beachten Sie, dass hier das <em>SharedModule</em> importiert wird. Die von ihr angebotene <em>CityPipe</em> kommt in der <em>FlightSearchComponent</em> zum Einsatz.</p>
+</li>
+<li>
+<p>Wechseln Sie in die Datei <em>app.module.ts</em> und passen Sie Ihr <em>AppModule</em> wie folgt an:</p>
+<pre><code class="language-TypeScript"><div><span class="hljs-meta">@NgModule</span>({
+imports: [
+  BrowserModule,
+  HttpClientModule,
+  FlightBookingModule <span class="hljs-comment">// &lt;-- Wichtig</span>
+],
+declarations: [
+  AppComponent,
+  SidebarComponent,
+  NavbarComponent
+],
+providers: [
+  […]
+],
+bootstrap: [AppComponent]
+})
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> AppModule { }
+</div></code></pre>
+</li>
+<li>
+<p>Kompilieren Sie Ihre Lösung mit dem TypeScriptCompiler in Ihrer IDE und korrigieren Sie eventuelle Fehler (z. B. fehlerhafte relative Pfade, die sich durch das Verschieben ergeben haben).</p>
+</li>
+<li>
+<p>Testen Sie Ihre neu strukturierte Lösung.</p>
+</li>
+</ol>
+</p>
+</details>
+
+    </body>
+    </html>
