@@ -24,8 +24,7 @@ export class CityValidatorDirective implements Validator {
             actualCity: control.value,
             validCities: this.validCities
           }
-
-        }
+        };
       }
     }
 

@@ -1,0 +1,42 @@
+<form [formGroup]="editForm">
+  <div class="form-group">
+      <label>Id:</label>
+      <input formControlName="id" class="form-control">
+  </div>
+
+  <div class="form-group">
+      <label>Date:</label>
+      <input formControlName="date" class="form-control">
+  </div>
+
+  <div class="form-group">
+      <label>From:</label>
+      <input formControlName="from" class="form-control">
+  </div>
+  <pre *ngIf="editForm.controls['from']?.invalid" >Element ist invalide.</pre>
+  <pre *ngIf="editForm.controls['from']?.hasError('required')" >Pflichtfeld</pre>
+  <pre *ngIf="editForm.controls['from']?.hasError('minlength')" >Min. 3 Zeichen</pre>
+  <pre *ngIf="editForm.controls['from']?.hasError('maxlength')" >Max. 15 Zeichen</pre>
+  <pre *ngIf="editForm.controls['from']?.hasError('city')" >Ungültige Stadt. Folgende sind gültig: {{editForm.controls['from']?.errors?.city?.validCities}}</pre>
+
+  <div class="form-group">
+      <label>To:</label>
+      <input formControlName="to" class="form-control">
+  </div>
+  <pre *ngIf="editForm.controls['to']?.invalid" >Element ist invalide.</pre>
+  <pre *ngIf="editForm.controls['to']?.hasError('required')" >Pflichtfeld</pre>
+  <pre *ngIf="editForm.controls['to']?.hasError('minlength')" >Min. 3 Zeichen</pre>
+  <pre *ngIf="editForm.controls['to']?.hasError('maxlength')" >Max. 15 Zeichen</pre>
+  <pre *ngIf="editForm.controls['to']?.hasError('city')" >Ungültige Stadt. Folgende sind gültig: {{editForm.controls['to']?.errors?.city?.validCities}}</pre>
+
+
+  <div class="form-group">
+      <button (click)="save()" class="btn btn-default">Save</button>
+  </div>
+
+  <pre>
+
+    {{ editForm.errors | json}}
+  </pre>
+
+</form>

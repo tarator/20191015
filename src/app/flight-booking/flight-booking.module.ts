@@ -4,6 +4,8 @@ import { SharedModule } from '../shared/shared.module';
 import { FlightSearchComponent } from './flight-search/flight-search.component';
 import { FlightCardComponent } from './flight-card/flight-card.component';
 import { StatusToggleComponent } from './status-toggle/status-toggle.component';
+import { FlightEditComponent } from './flight-edit/flight-edit.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 
@@ -11,7 +13,8 @@ import { StatusToggleComponent } from './status-toggle/status-toggle.component';
   declarations: [
     FlightSearchComponent,
     FlightCardComponent,
-    StatusToggleComponent
+    StatusToggleComponent,
+    FlightEditComponent
   ],
   imports: [
     CommonModule,
@@ -19,7 +22,8 @@ import { StatusToggleComponent } from './status-toggle/status-toggle.component';
   ],
   exports: [
     SharedModule,
-    FlightSearchComponent
+    FlightSearchComponent,
+    FlightEditComponent
   ]
 })
 export class FlightBookingModule { }
