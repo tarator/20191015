@@ -11,6 +11,7 @@ import { HomeComponent } from './home/home.component';
 import { RouterModule } from '@angular/router';
 import { APP_ROUTES } from './app.routes';
 
+
 @NgModule({
    imports: [
       BrowserModule,

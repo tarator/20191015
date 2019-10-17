@@ -25,9 +25,7 @@ import { FlightBookingRoutingModule } from './flight-booking-routing.module';
     FlightBookingRoutingModule
   ],
   exports: [
-    SharedModule,
-    FlightSearchComponent,
-    FlightEditComponent
+    SharedModule
   ]
 })
 export class FlightBookingModule { }
